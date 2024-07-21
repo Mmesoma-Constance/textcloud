@@ -35,7 +35,9 @@ function createNote() {
   //
   inputBox.className = "input-box";
   contentBox.className = "contentBox";
+  contentBox.classList.add("sansita-regular");
   time.className = "time";
+  time.classList.add("sansita-regular");
   contentBox.setAttribute("contenteditable", true);
 
   //
@@ -83,7 +85,7 @@ function handleKey(event) {
   if (event.key === "Enter") {
     event.preventDefault();
     console.log("clicked");
-    document.execCommand("insertHTML", false, "<br>");
+    document.execCommand("insertHTML", false, "<p><br></p>");
   }
 
   // if (event.key === "Enter") {
@@ -117,18 +119,28 @@ function updateStorage() {
 
 function handleSearch() {
   const query = searchBar.value.toLowerCase();
+  resultContainer.innerHTML = "";
   document.querySelectorAll(".input-box").forEach((inputBox) => {
-    const contentBox = inputBox.querySelector(".contentBox");
-    const time = inputBox.querySelector("span").textContent.toLowerCase();
-    const content = contentBox.innerHTML.toLowerCase();
+    let contentBox = inputBox.querySelector(".contentBox");
+
+    const time = inputBox.querySelector("span").innerText.toLowerCase();
+    const content = contentBox.innerText
+      .replace(/\[br\]/g, "<br>")
+      .toLowerCase();
+
+    console.log(contentBox.innerText);
     if (content.includes(query) || time.includes(query)) {
       inputBox.classList.remove("hidden");
+
       highlightText(contentBox, query);
       highlightText(inputBox.querySelector("span"), query);
-      contentBox.addEventListener("keypress", handleKey);
+
+      console.log(contentBox);
     } else {
       inputBox.classList.add("hidden");
+
       removeHighlight(contentBox);
+
       removeHighlight(inputBox.querySelector("span"), query);
     }
   });
@@ -136,24 +148,21 @@ function handleSearch() {
 
 // highlight text
 function highlightText(contentBox, query) {
-  const content = contentBox.textContent;
-  const regex = new RegExp(`(${query})`, "gi");
-  const highlighted = content.replace(
-    regex,
-    '<span class="highlight">$1</span>'
+  const text = contentBox.innerText;
+  const highlighted = text.replace(
+    new RegExp(query, "gi"),
+    (match) => `<span class="highlight">${match}</span>`
   );
-  contentBox.innerHTML = highlighted.replace(/<br>/g, "[br]");
-  contentBox.addEventListener("keypress", handleKey);
+  const brTag = highlighted.replace(/&nbsp;/g, "<br>");
+  contentBox.innerHTML = brTag;
+  // const regex = new RegExp(`(${query})`, "gi");
+  // return contentBox.innerText;
 }
 
 function removeHighlight(contentBox) {
-  // contentBox.innerHTML = contentBox.innerHTML.replace(
-  //   /<span class="highlight">(.*?)<\/span>/gi,
-  //   "$1"
-  // );
-
   const text = contentBox.textContent;
-  contentBox.innerHTML = text.replace(/\[br\]/g, "<br>");
+  contentBox.innerHTML = text;
+  // console.log(contentBox);.replace(/\[br\]/g, "<br>");
 }
 
 function updateTime(inputBox) {
@@ -212,7 +221,9 @@ function showNotes() {
     //
     inputBox.className = "input-box";
     contentBox.className = "contentBox";
+    contentBox.classList.add("sansita-regular");
     time.className = "time";
+    time.classList.add("sansita-regular");
     contentBox.setAttribute("contenteditable", true);
 
     //
@@ -220,6 +231,7 @@ function showNotes() {
 
     time.textContent = note.time;
     contentBox.innerHTML = note.content.replace(/\[br\]/g, "<br>");
+
     //
     inputBox.appendChild(time);
     inputBox.appendChild(br);
