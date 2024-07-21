@@ -25,7 +25,7 @@ createBtn.addEventListener("click", () => {
 
 searchBar.addEventListener("input", handleSearch);
 
-const searchPlaceholder = document.querySelector(".search-placeholder-text");
+const searchPlaceholder = document.querySelector(".search-placeholder");
 searchBar.addEventListener("input", () => {
   if (searchBar.value.length > 0) {
     searchPlaceholder.style.display = "none";
@@ -34,24 +34,24 @@ searchBar.addEventListener("input", () => {
   }
 });
 
-// const inputField = document.querySelector(".input-field");
-// const clearBtn = document.querySelector(".clear-btn");
+const inputField = document.querySelector(".input-field");
+const clearBtn = document.querySelector(".clear-btn");
 
-// inputField.addEventListener("input", () => {
-//   if (inputField.textContent.trim() === "") {
-//     inputField.setAttribute("data-placeholder", "Search texts...");
-//     clearBtn.style.display = "none";
-//   } else {
-//     inputField.setAttribute("data-placeholder", "");
-//     clearBtn.style.display = "inline";
-//   }
-// });
+inputField.addEventListener("input", () => {
+  if (inputField.textContent.trim() === "") {
+    inputField.setAttribute("data-placeholder", "Search texts...");
+    clearBtn.style.display = "none";
+  } else {
+    inputField.setAttribute("data-placeholder", "");
+    clearBtn.style.display = "inline";
+  }
+});
 
-// function clearInput() {
-//   inputField.textContent = "";
-//   clearBtn.style.display = "none";
-//   inputField.focus();
-// }
+function clearInput() {
+  inputField.textContent = "";
+  clearBtn.style.display = "none";
+  inputField.focus();
+}
 
 function createNote() {
   let inputBox = document.createElement("div");
@@ -180,7 +180,7 @@ function highlightText(contentBox, query) {
   const text = contentBox.innerText;
   const highlighted = text.replace(
     new RegExp(query, "gi"),
-    (match) => `<span class="highlight sansita-regular">${match}</span>`
+    (match) => `<span class="highlight">${match}</span>`
   );
   const brTag = highlighted.replace(/&nbsp;/g, "<br>");
   contentBox.innerHTML = brTag;
@@ -224,7 +224,6 @@ function moveToTop(note) {
   //   selection.addRange(range);
   // }
   const contentBox = note.querySelector(".contentBox");
-  contentBox.classList.add("sansita-regular");
   contentBox.focus();
 
   const range = document.createRange();
@@ -298,7 +297,6 @@ document.querySelectorAll("contentBox").forEach((contentBox) => {
 notesContainer.addEventListener("click", function (e) {
   if (e.target.tagName === "IMG") {
     e.target.parentElement.remove();
-    console.log("deleted");
     updateStorage();
   } else if (e.target.tagName === "P") {
     notes = document.querySelectorAll(".input-box");

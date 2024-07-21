@@ -1,7 +1,7 @@
 const notesContainer = document.querySelector(".notes-container");
 const createBtn = document.querySelector(".btn");
 let notes = document.querySelectorAll(".input-box");
-const searchBar = document.getElementById("search-bar");
+const searchBar = document.querySelector(".input-field");
 const resultContainer = document.getElementById("results");
 let contentBox;
 const texts = [];
@@ -25,33 +25,30 @@ createBtn.addEventListener("click", () => {
 
 searchBar.addEventListener("input", handleSearch);
 
-const searchPlaceholder = document.querySelector(".search-placeholder-text");
+const searchPlaceholder = document.querySelector(".search-placeholder");
 searchBar.addEventListener("input", () => {
-  if (searchBar.value.length > 0) {
+  if (searchBar.textContent.length > 0) {
     searchPlaceholder.style.display = "none";
   } else {
     searchPlaceholder.style.display = "flex";
   }
 });
 
-// const inputField = document.querySelector(".input-field");
-// const clearBtn = document.querySelector(".clear-btn");
+const inputField = document.querySelector(".input-field");
+const clearBtn = document.querySelector(".clear-btn");
 
-// inputField.addEventListener("input", () => {
-//   if (inputField.textContent.trim() === "") {
-//     inputField.setAttribute("data-placeholder", "Search texts...");
-//     clearBtn.style.display = "none";
-//   } else {
-//     inputField.setAttribute("data-placeholder", "");
-//     clearBtn.style.display = "inline";
-//   }
-// });
+inputField.addEventListener("input", () => {
+  if (inputField.textContent.trim() === "") {
+    inputField.setAttribute("data-placeholder", "Search texts...");
+    clearBtn.style.display = "none";
+  } else {
+    inputField.setAttribute("data-placeholder", "");
+    clearBtn.style.display = "inline";
+  }
+  filterNote(inputField.textContent.trim());
+});
 
-// function clearInput() {
-//   inputField.textContent = "";
-//   clearBtn.style.display = "none";
-//   inputField.focus();
-// }
+clearBtn.addEventListener("click", clearInput);
 
 function createNote() {
   let inputBox = document.createElement("div");
@@ -67,7 +64,7 @@ function createNote() {
   time.className = "time";
   time.classList.add("sansita-regular");
   contentBox.setAttribute("contenteditable", true);
-  console.log(contentBox.value);
+  console.log(contentBox.textContent);
 
   //
   img.src = "images/del2.png";
@@ -147,7 +144,7 @@ function updateStorage() {
 }
 
 function handleSearch() {
-  const query = searchBar.value.toLowerCase();
+  const query = searchBar.textContent.toLowerCase();
   resultContainer.innerHTML = "";
   document.querySelectorAll(".input-box").forEach((inputBox) => {
     let contentBox = inputBox.querySelector(".contentBox");
@@ -157,7 +154,7 @@ function handleSearch() {
       .replace(/\[br\]/g, "<br>")
       .toLowerCase();
 
-    console.log(contentBox.innerText);
+    // console.log(contentBox.innerText);
     if (content.includes(query) || time.includes(query)) {
       inputBox.classList.remove("hidden");
 
@@ -180,7 +177,7 @@ function highlightText(contentBox, query) {
   const text = contentBox.innerText;
   const highlighted = text.replace(
     new RegExp(query, "gi"),
-    (match) => `<span class="highlight sansita-regular">${match}</span>`
+    (match) => `<span class="highlight">${match}</span>`
   );
   const brTag = highlighted.replace(/&nbsp;/g, "<br>");
   contentBox.innerHTML = brTag;
@@ -224,7 +221,6 @@ function moveToTop(note) {
   //   selection.addRange(range);
   // }
   const contentBox = note.querySelector(".contentBox");
-  contentBox.classList.add("sansita-regular");
   contentBox.focus();
 
   const range = document.createRange();
@@ -291,6 +287,29 @@ function showNotes() {
   });
 }
 
+function filterNote(query) {
+  query = query.toLowerCase();
+  console.log(query);
+  const notes = Array.from(notesContainer.children);
+  notes.forEach((note) => {
+    const contentBox = note.querySelector(".contentBox");
+    if (contentBox.textContent.toLowerCase().includes(query)) {
+      note.style.display = "";
+    } else {
+      note.style.display = "none";
+    }
+  });
+}
+
+function clearInput() {
+  inputField.textContent = "";
+  clearBtn.style.display = "none";
+  inputField.focus();
+  inputField.setAttribute("data-placeholder", "Search texts...");
+  filterNote("");
+  console.log("note reset");
+}
+
 document.querySelectorAll("contentBox").forEach((contentBox) => {
   contentBox.addEventListener("input", updateStorage);
 });
@@ -298,7 +317,6 @@ document.querySelectorAll("contentBox").forEach((contentBox) => {
 notesContainer.addEventListener("click", function (e) {
   if (e.target.tagName === "IMG") {
     e.target.parentElement.remove();
-    console.log("deleted");
     updateStorage();
   } else if (e.target.tagName === "P") {
     notes = document.querySelectorAll(".input-box");
