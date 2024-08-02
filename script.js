@@ -57,6 +57,7 @@ function createNote() {
   let inputBox = document.createElement("div");
   let contentBox = document.createElement("div");
   let img = document.createElement("img");
+  let delImg = document.createElement("img");
   let time = document.createElement("span");
   let br = document.createElement("br");
 
@@ -67,10 +68,13 @@ function createNote() {
   time.className = "time";
   time.classList.add("sansita-regular");
   contentBox.setAttribute("contenteditable", true);
-  console.log(contentBox.value);
+  console.log(contentBox.innerText);
 
   //
   img.src = "images/del2.png";
+  img.classList.add("delete");
+  delImg.src = "images/play.png";
+  delImg.classList.add("speech");
   let now = new Date();
   let date = now.toLocaleDateString("en-US", {
     weekday: "long",
@@ -91,6 +95,7 @@ function createNote() {
   inputBox.appendChild(contentBox);
   inputBox.appendChild(br);
   inputBox.appendChild(img);
+  inputBox.appendChild(delImg);
 
   notesContainer.insertBefore(inputBox, notesContainer.firstChild);
 
@@ -237,6 +242,7 @@ function moveToTop(note) {
 
 function showNotes() {
   const notes = JSON.parse(localStorage.getItem("notes")) || [];
+
   while (notesContainer.firstChild) {
     notesContainer.removeChild(notesContainer.firstChild);
   }
@@ -245,6 +251,7 @@ function showNotes() {
     let inputBox = document.createElement("div");
     let contentBox = document.createElement("div");
     let img = document.createElement("img");
+    let delImg = document.createElement("img");
     let time = document.createElement("span");
     let br = document.createElement("br");
 
@@ -258,6 +265,9 @@ function showNotes() {
 
     //
     img.src = "images/del2.png";
+    img.classList.add("delete");
+    delImg.src = "images/play.png";
+    delImg.classList.add("speech");
 
     time.textContent = note.time;
     contentBox.innerHTML = note.content.replace(/\[br\]/g, "<br>");
@@ -268,6 +278,7 @@ function showNotes() {
     inputBox.appendChild(contentBox);
     inputBox.appendChild(br);
     inputBox.appendChild(img);
+    inputBox.appendChild(delImg);
 
     notesContainer.appendChild(inputBox);
 
@@ -280,6 +291,7 @@ function showNotes() {
       updateTime(inputBox);
       moveToTop(inputBox);
       updateStorage();
+      console.log(contentBox.innerText);
     });
 
     // contentBox.addEventListener("keydown", (event) => {
@@ -295,11 +307,28 @@ document.querySelectorAll("contentBox").forEach((contentBox) => {
   contentBox.addEventListener("input", updateStorage);
 });
 
+let currentSpeech;
+
 notesContainer.addEventListener("click", function (e) {
-  if (e.target.tagName === "IMG") {
+  if (e.target.className === "delete") {
     e.target.parentElement.remove();
     console.log("deleted");
     updateStorage();
+  } else if (e.target.className === "speech") {
+    // let contentBox = e.target.querySelector(".contentBox");
+    const textValue = e.target.parentElement.children[1].innerText;
+
+    let speech = new SpeechSynthesisUtterance();
+
+    speech.text = textValue;
+
+    window.speechSynthesis.speak(speech);
+
+    // if (speechClick % 2 === 0) {
+    //   window.speechSynthesis.pause(speech);
+    // } else {
+    //   window.speechSynthesis.resume(speech);
+    // }
   } else if (e.target.tagName === "P") {
     notes = document.querySelectorAll(".input-box");
     notes.forEach((nt) => {
@@ -310,6 +339,11 @@ notesContainer.addEventListener("click", function (e) {
   }
 });
 
+// if (contentBox) {
+//
+//   // console.log(contentBox);
+//   console.log(textToSpeech);
+// }
 const motionText = [
   "Passwords",
   "Links",
@@ -369,3 +403,14 @@ function updateMotionText() {
 setInterval(updateMotionText, 2000);
 
 updateMotionText();
+
+// text to speech
+
+// let speech = new SpeechSynthesisUtterance();
+document.querySelectorAll(".speech").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    alert("speech btn");
+    // speech.text = contentBox.value;
+    // window.speechSynthesis.speak(speech);
+  });
+});
